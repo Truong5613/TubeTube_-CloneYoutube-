@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tubetube/features/auth/model/user_model.dart';
+import 'package:tubetube/features/Model/user_model.dart';
 class TopHeader extends StatelessWidget {
   final UserModel user;
   const TopHeader({super.key, required this.user});

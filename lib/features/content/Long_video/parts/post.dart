@@ -2,10 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tubetube/features/auth/model/user_model.dart';
+import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/auth/provider/user_provider.dart';
 import 'package:tubetube/features/content/Long_video/parts/video.dart';
-import 'package:tubetube/features/upload/long_video/video_model.dart';
+import 'package:tubetube/features/Model/video_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
 class Post extends ConsumerWidget {
   final VideoModel video;
@@ -16,6 +16,7 @@ class Post extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    timeago.setLocaleMessages('vi', timeago.ViMessages());
     final AsyncValue<UserModel> userModel =
     ref.watch(anyUserDataProvider(video.userId));
 
@@ -46,7 +47,6 @@ class Post extends ConsumerWidget {
           children: [
             CachedNetworkImage(
               imageUrl: video.thumbnail,
-
             ),
 
             Row(
@@ -90,14 +90,14 @@ class Post extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: Text(
-                              video.views == 0 ? "No View" : "${video.views} views",
+                              video.views == 0 ? "0 lượt xem" : "${video.views} lượt xem",
                               style: const TextStyle(
                                 color: Colors.blueGrey,
                               ),
                             ),
                           ),
                           Text(
-                            timeago.format(video.datePublished),
+                            timeago.format(video.datePublished,locale: 'vi'),
                             style: const TextStyle(
                               color: Colors.blueGrey,
                             ),

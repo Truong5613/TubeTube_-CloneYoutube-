@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tubetube/features/account/items.dart';
-import 'package:tubetube/features/auth/model/user_model.dart';
+import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/channel/my_channel/pages/my_channel_screen.dart';
 
 class AccountPage extends StatelessWidget {

@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tubetube/features/upload/long_video/video_details_page.dart';
+import 'package:tubetube/features/upload/short_video/short_video_screen_edit.dart';
 
 void showErrorSnackBar(String message, BuildContext context, {int seconds = 2}) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -63,5 +64,25 @@ Future<File?> pickImage() async {
     return File(file.path);
   } catch (e) {
     throw Exception("Failed to pick image: $e");
+  }
+}
+Future pickShortVideo(BuildContext context) async {
+  try {
+    XFile? file = await ImagePicker().pickVideo(source: ImageSource.gallery);
+
+    if (file == null) {
+      showErrorSnackBar('No video selected', context);
+      return;
+    }
+
+    File video = File(file.path);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ShortVideoScreen(shortVideo: video,),
+      ),
+    );
+  } catch (e) {
+    showErrorSnackBar('Failed to pick video: $e', context);
   }
 }

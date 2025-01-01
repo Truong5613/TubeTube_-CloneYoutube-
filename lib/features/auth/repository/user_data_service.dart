@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../model/user_model.dart';
+import '../../Model/user_model.dart';
 
 final userDataServiceProvider = Provider((ref) => UserDataService(
     auth: FirebaseAuth.instance,

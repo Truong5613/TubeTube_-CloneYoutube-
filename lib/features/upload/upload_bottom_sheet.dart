@@ -33,7 +33,9 @@ class CreateBottomSheet extends StatelessWidget {
                 height: 38,
                 child: ImageItem(
                   itemText: "Create a Short",
-                  itemClicked: () async {},
+                  itemClicked: () async {
+                    pickShortVideo(context);
+                  },
                   imageName: "short-video.png",
                   haveColor: true,
                 ),

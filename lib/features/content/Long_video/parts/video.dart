@@ -9,10 +9,11 @@ import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
 import 'package:tubetube/cores/widgets/flat_button.dart';
 import 'package:tubetube/cores/widgets/long_video/video_externel_buttons.dart';
-import 'package:tubetube/features/auth/model/user_model.dart';
+import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/auth/provider/user_provider.dart';
 import 'package:tubetube/features/content/Long_video/parts/post.dart';
-import 'package:tubetube/features/upload/long_video/video_model.dart';
+import 'package:tubetube/features/content/comment/comment_sheet.dart';
+import 'package:tubetube/features/Model/video_model.dart';
 import 'package:video_player/video_player.dart';
 
 class Video extends ConsumerStatefulWidget {
@@ -34,6 +35,7 @@ class _VideoState extends ConsumerState<Video> {
 
   @override
   void initState() {
+    timeago.setLocaleMessages('vi', timeago.ViMessages());
     super.initState();
     _controller = VideoPlayerController.networkUrl(
       Uri.parse(widget.video.videoUrl),
@@ -211,7 +213,7 @@ class _VideoState extends ConsumerState<Video> {
                   Padding(
                     padding: const EdgeInsets.only(left: 4, right: 8),
                     child: Text(
-                      timeago.format(widget.video.datePublished),
+                      timeago.format(widget.video.datePublished, locale: 'vi'),
                       style: const TextStyle(
                         fontSize: 13.4,
                         color: Color(0xff5F5F5F),
@@ -328,6 +330,75 @@ class _VideoState extends ConsumerState<Video> {
                 ),
               ),
             ),
+            //Khu Binh Luan
+            GestureDetector(
+              onTap: () {
+                // Hiển thị CommentSheet
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => CommentSheet(video: widget.video),
+                );
+              },
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8),
+                      ),
+                    ),
+                    height: 80,
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Bình Luận",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 15,
+                              backgroundColor: Colors.grey,
+                              backgroundImage: CachedNetworkImageProvider(
+                                user.value!.profilePic,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                    width: 1,
+                                  ),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                child: Text(
+                                  "Viết bình luận...",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
@@ -346,7 +417,7 @@ class _VideoState extends ConsumerState<Video> {
                   final videos = videosMap
                       .map(
                         (video) => VideoModel.fromMap(video.data()),
-                  )
+                      )
                       .toList();
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
 import 'package:tubetube/features/content/Long_video/parts/post.dart';
-import 'package:tubetube/features/upload/long_video/video_model.dart';
+import 'package:tubetube/features/Model/video_model.dart';
 
 class LongVideoScreen extends StatelessWidget {
   const LongVideoScreen({super.key});

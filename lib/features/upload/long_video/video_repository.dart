@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tubetube/features/upload/long_video/video_model.dart';
+import 'package:tubetube/features/Model/video_model.dart';
 
 class VideoRepository {
   FirebaseFirestore firestore;
