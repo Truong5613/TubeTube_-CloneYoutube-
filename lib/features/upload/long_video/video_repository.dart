@@ -1,6 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/features/Model/video_model.dart';
+
+final longVideoProvider = Provider(
+      (ref) => VideoRepository(firestore: FirebaseFirestore.instance),
+);
 
 class VideoRepository {
   FirebaseFirestore firestore;
@@ -40,5 +45,27 @@ class VideoRepository {
         transaction.set(userRef, {'videos': 1});
       }
     });
+  }
+  Future<void> likeVideo({
+    required List? likes,
+    required videoId,
+    required currentUserId,
+  }) async {
+    if (!likes!.contains(currentUserId)) {
+      await FirebaseFirestore.instance
+          .collection("videos")
+          .doc(videoId)
+          .update({
+        "likes": FieldValue.arrayUnion([currentUserId])
+      });
+    }
+    if (likes.contains(currentUserId)) {
+      await FirebaseFirestore.instance
+          .collection("videos")
+          .doc(videoId)
+          .update({
+        "likes": FieldValue.arrayRemove([currentUserId])
+      });
+    }
   }
 }

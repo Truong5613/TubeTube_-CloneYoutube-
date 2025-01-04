@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, prefer_const_constructors, prefer_const_literals_to_create_immutables
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/material.dart';
@@ -8,12 +9,19 @@ import 'package:tubetube/cores/colors.dart';
 import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
 import 'package:tubetube/cores/widgets/flat_button.dart';
-import 'package:tubetube/cores/widgets/long_video/video_externel_buttons.dart';
+import 'package:tubetube/features/Model/comment_model.dart';
 import 'package:tubetube/features/Model/user_model.dart';
+import 'package:tubetube/features/Repository/subcribe_respository.dart';
 import 'package:tubetube/features/auth/provider/user_provider.dart';
+import 'package:tubetube/features/channel/users_channel/user_channel_page.dart';
+import 'package:tubetube/features/content/Long_video/Widget/video_first_comment.dart';
 import 'package:tubetube/features/content/Long_video/parts/post.dart';
+import 'package:tubetube/features/content/comment/comment_provider.dart';
 import 'package:tubetube/features/content/comment/comment_sheet.dart';
 import 'package:tubetube/features/Model/video_model.dart';
+import 'package:tubetube/features/content/Long_video/Widget/video_externel_button.dart';
+import 'package:tubetube/features/upload/long_video/video_details_page.dart';
+import 'package:tubetube/features/upload/long_video/video_repository.dart';
 import 'package:video_player/video_player.dart';
 
 class Video extends ConsumerStatefulWidget {
@@ -39,7 +47,8 @@ class _VideoState extends ConsumerState<Video> {
     super.initState();
     _controller = VideoPlayerController.networkUrl(
       Uri.parse(widget.video.videoUrl),
-    )..initialize().then((_) {
+    )
+      ..initialize().then((_) {
         setState(() {});
       });
   }
@@ -70,10 +79,25 @@ class _VideoState extends ConsumerState<Video> {
     _controller!.seekTo(position);
   }
 
+  likeVideo() async {
+    setState(() {
+      if (widget.video.likes.contains(FirebaseAuth.instance.currentUser!.uid)) {
+        widget.video.likes.remove(FirebaseAuth.instance.currentUser!.uid);
+      } else {
+        widget.video.likes.add(FirebaseAuth.instance.currentUser!.uid);
+      }
+    });
+
+    await ref.read(longVideoProvider).likeVideo(
+        likes: widget.video.likes,
+        videoId: widget.video.videoId,
+        currentUserId: FirebaseAuth.instance.currentUser!.uid);
+  }
+
   @override
   Widget build(BuildContext context) {
     final AsyncValue<UserModel> user =
-        ref.watch(anyUserDataProvider(widget.video.userId));
+    ref.watch(anyUserDataProvider(widget.video.userId));
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey,
@@ -82,101 +106,101 @@ class _VideoState extends ConsumerState<Video> {
           preferredSize: const Size.fromHeight(176),
           child: _controller!.value.isInitialized
               ? AspectRatio(
-                  aspectRatio: _controller!.value.aspectRatio,
-                  child: GestureDetector(
-                    onTap: isShowIcons
-                        ? () {
-                            isShowIcons = false;
-                            setState(() {});
-                          }
-                        : () {
-                            isShowIcons = true;
-                            setState(() {});
-                          },
-                    child: Stack(
-                      children: [
-                        VideoPlayer(_controller!),
-                        isShowIcons
-                            ? Positioned(
-                                left: 182,
-                                top: 87,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    toggleVideoPlayer();
-                                  },
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: Image.asset(
-                                      "assets/images/play.png",
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
-                        isShowIcons
-                            ? Positioned(
-                                left: 55,
-                                top: 87,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    goBackward();
-                                  },
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: Image.asset(
-                                      "assets/images/go_back_final.png",
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
-                        isShowIcons
-                            ? Positioned(
-                                right: 55,
-                                top: 87,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    goForward();
-                                  },
-                                  child: SizedBox(
-                                    height: 50,
-                                    child: Image.asset(
-                                      "assets/images/go_ahead_final.png",
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
-                        isShowIcons
-                            ? Align(
-                                alignment: Alignment.bottomCenter,
-                                child: SizedBox(
-                                  height: 10,
-                                  child: VideoProgressIndicator(
-                                    _controller!,
-                                    allowScrubbing: true,
-                                    colors: VideoProgressColors(
-                                      playedColor: Colors.red,
-                                      bufferedColor: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
-                      ],
+            aspectRatio: _controller!.value.aspectRatio,
+            child: GestureDetector(
+              onTap: isShowIcons
+                  ? () {
+                isShowIcons = false;
+                setState(() {});
+              }
+                  : () {
+                isShowIcons = true;
+                setState(() {});
+              },
+              child: Stack(
+                children: [
+                  VideoPlayer(_controller!),
+                  isShowIcons
+                      ? Positioned(
+                    left: 182,
+                    top: 87,
+                    child: GestureDetector(
+                      onTap: () {
+                        toggleVideoPlayer();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Image.asset(
+                          "assets/images/play.png",
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  ),
-                )
+                  )
+                      : SizedBox(),
+                  isShowIcons
+                      ? Positioned(
+                    left: 55,
+                    top: 87,
+                    child: GestureDetector(
+                      onTap: () {
+                        goBackward();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Image.asset(
+                          "assets/images/go_back_final.png",
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+                  isShowIcons
+                      ? Positioned(
+                    right: 55,
+                    top: 87,
+                    child: GestureDetector(
+                      onTap: () {
+                        goForward();
+                      },
+                      child: SizedBox(
+                        height: 50,
+                        child: Image.asset(
+                          "assets/images/go_ahead_final.png",
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+                  isShowIcons
+                      ? Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SizedBox(
+                      height: 10,
+                      child: VideoProgressIndicator(
+                        _controller!,
+                        allowScrubbing: true,
+                        colors: VideoProgressColors(
+                          playedColor: Colors.red,
+                          bufferedColor: Colors.grey,
+                        ),
+                      ),
+                    ),
+                  )
+                      : SizedBox(),
+                ],
+              ),
+            ),
+          )
               : Padding(
-                  padding: EdgeInsets.only(bottom: 100),
-                  child: CircularProgressIndicator(
-                    color: Colors.red,
-                    strokeWidth: 4,
-                  ),
-                ),
+            padding: EdgeInsets.only(bottom: 100),
+            child: CircularProgressIndicator(
+              color: Colors.red,
+              strokeWidth: 4,
+            ),
+          ),
         ),
       ),
       body: SafeArea(
@@ -202,8 +226,8 @@ class _VideoState extends ConsumerState<Video> {
                     padding: const EdgeInsets.only(left: 8, right: 4),
                     child: Text(
                       widget.video.views == 0
-                          ? "No view"
-                          : "${widget.video.views} views",
+                          ? "Không lượt xem"
+                          : "${widget.video.views} lượt xem",
                       style: const TextStyle(
                         fontSize: 13.4,
                         color: Color(0xff5F5F5F),
@@ -231,11 +255,20 @@ class _VideoState extends ConsumerState<Video> {
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Colors.grey,
-                    backgroundImage:
-                        CachedNetworkImageProvider(user.value!.profilePic),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserChannelPage(userId: widget.video.userId),
+                        ),
+                      );
+                    },
+                    child: CircleAvatar(
+                      radius: 14,
+                      backgroundColor: Colors.grey,
+                      backgroundImage: CachedNetworkImageProvider(user.value!.profilePic),
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
@@ -253,8 +286,8 @@ class _VideoState extends ConsumerState<Video> {
                     padding: const EdgeInsets.only(right: 5, left: 5),
                     child: Text(
                       user.value!.subscriptions.isEmpty
-                          ? "0 Subcriptions"
-                          : "${user.value!.subscriptions.length} subcriptions",
+                          ? "0 ĐĂNG KÝ"
+                          : "${user.value!.subscriptions.length} đăng ký",
                       style: TextStyle(fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -264,11 +297,19 @@ class _VideoState extends ConsumerState<Video> {
                     width: 100,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 6),
-                      child: FlatButton(
-                        text: "Subscribe",
-                        onPressed: () {},
-                        colour: Colors.black,
-                      ),
+                      child: (FirebaseAuth.instance.currentUser!.uid != user.value!.userId)
+                          ? ElevatedButton(
+                        onPressed: () async {
+                          await ref.watch(subscribeChannelProvider).subscribeChannel(
+                            userId: user.value!.userId,
+                            currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                            subscriptions: user.value!.subscriptions,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                        child: const Text("ĐĂNG KÝ"),
+                      )
+                          : const SizedBox(), // Ẩn nếu là user của chính mình
                     ),
                   ),
                 ],
@@ -293,17 +334,21 @@ class _VideoState extends ConsumerState<Video> {
                       ),
                       child: Row(
                         children: [
-                          GestureDetector(
-                            onTap: () {},
-                            child: Icon(
-                              Icons.thumb_up,
-                              size: 15.5,
-                            ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: Text("${widget.video.likes.length}",
+                              style: TextStyle(fontSize: 16),),
                           ),
-                          const SizedBox(width: 20),
-                          const Icon(
-                            Icons.thumb_down,
-                            size: 15.5,
+                          GestureDetector(
+                            onTap: likeVideo,
+                            child: Icon(
+                              Icons.favorite,
+                              color: widget.video.likes.contains(
+                                  FirebaseAuth.instance.currentUser!.uid)
+                                  ? Colors.red
+                                  : Colors.black,
+                              size: 20,
+                            ),
                           ),
                         ],
                       ),
@@ -331,72 +376,90 @@ class _VideoState extends ConsumerState<Video> {
               ),
             ),
             //Khu Binh Luan
-            GestureDetector(
-              onTap: () {
-                // Hiển thị CommentSheet
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) => CommentSheet(video: widget.video),
-                );
-              },
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8),
+            Padding(
+              padding: const EdgeInsets.only(top: 5),
+              child: GestureDetector(
+                onTap: () {
+                  // Hiển thị CommentSheet
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => CommentSheet(video: widget.video),
+                  );
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8),
+                        ),
+                      ),
+                      height: 120,
+                      width: double.infinity,
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Consumer(
+                            builder: (context, ref, child) {
+                              final AsyncValue<List<CommentModel>> comments =
+                              ref.watch(
+                                commentsProvider(widget.video.videoId),
+                              );
+                              if (comments.value!.isEmpty) {
+                                return const SizedBox(
+                                  height: 20,
+                                );
+                              }
+                              return VideoFirstComment(
+                                comments: comments.value!,
+                                user: user.value!,
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 15,
+                                  backgroundColor: Colors.grey,
+                                  backgroundImage: CachedNetworkImageProvider(
+                                    user.value!.profilePic,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Colors.grey.shade300,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4, vertical: 2),
+                                    child: Text(
+                                      "Viết bình luận...",
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    height: 80,
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Bình Luận",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 15,
-                              backgroundColor: Colors.grey,
-                              backgroundImage: CachedNetworkImageProvider(
-                                user.value!.profilePic,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                    width: 1,
-                                  ),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                child: Text(
-                                  "Viết bình luận...",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Expanded(
@@ -417,7 +480,7 @@ class _VideoState extends ConsumerState<Video> {
                   final videos = videosMap
                       .map(
                         (video) => VideoModel.fromMap(video.data()),
-                      )
+                  )
                       .toList();
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),

@@ -44,8 +44,10 @@ class _CommentSheetState extends ConsumerState<CommentSheet> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.close_rounded),
                 )
               ],
             ),
@@ -97,10 +99,11 @@ class _CommentSheetState extends ConsumerState<CommentSheet> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 5, right: 8),
-                  child:  CircleAvatar(
+                  child: CircleAvatar(
                     radius: 20,
                     backgroundColor: Colors.grey,
-                    backgroundImage: CachedNetworkImageProvider(user.value!.profilePic),
+                    backgroundImage:
+                        CachedNetworkImageProvider(user.value!.profilePic),
                   ),
                 ),
                 const SizedBox(width: 10),

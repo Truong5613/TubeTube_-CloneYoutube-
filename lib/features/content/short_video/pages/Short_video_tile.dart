@@ -70,7 +70,7 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
           child: shortVideoController.value.isInitialized
               ? SizedBox.expand(
             child: FittedBox(
-              fit: BoxFit.cover,
+              fit: BoxFit.fitWidth,
               child: SizedBox(
                 width: shortVideoController.value.size.width,
                 height: shortVideoController.value.size.height,

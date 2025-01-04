@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/cores/colors.dart';
@@ -26,13 +27,12 @@ class MyChannelScreen extends ConsumerWidget {
                   children: [
                     //Thong tin TopHeader
                     TopHeader(user: currentUser),
-
                     const Text("More about this channel"),
 
                     Buttons(),
                     // Tao Thanh Tab
                     PageTabBar(),
-                    TabPages(),
+                    TabPages(Userid: FirebaseAuth.instance.currentUser!.uid,),
                   ],
                 ),
               ),

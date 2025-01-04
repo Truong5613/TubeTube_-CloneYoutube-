@@ -20,7 +20,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +91,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             Expanded(
-              child: pages[currentIndex],
+              child: pages[currentIndex], // Nếu KnowIndex là null, sử dụng currentIndex
             )
           ],
         ),

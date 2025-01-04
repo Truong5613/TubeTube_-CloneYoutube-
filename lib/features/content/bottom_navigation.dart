@@ -13,7 +13,7 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  int currnetIndex = 0;
+  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -58,11 +58,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
         ],
         onTabChange: (index) {
           setState(() {
-            currnetIndex = index;
+            currentIndex = index;
           });
           widget.onPressed(index);
         },
-        selectedIndex: currnetIndex,
+        selectedIndex: currentIndex,
       ),
     );
   }

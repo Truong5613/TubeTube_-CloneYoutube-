@@ -8,9 +8,7 @@ import 'package:tubetube/cores/method.dart';
 import 'package:tubetube/features/upload/long_video/video_repository.dart';
 import 'package:uuid/uuid.dart';
 
-final longVideoProvider = Provider(
-  (ref) => VideoRepository(firestore: FirebaseFirestore.instance),
-);
+
 
 class VideoDetailsPage extends ConsumerStatefulWidget {
   final File? video;
