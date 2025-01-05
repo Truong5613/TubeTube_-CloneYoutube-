@@ -5,6 +5,7 @@ import 'package:tubetube/cores/screens/loader.dart';
 import 'package:tubetube/features/Model/short_video_model.dart';
 import 'package:tubetube/features/Model/video_model.dart';
 import 'package:tubetube/features/Provider/channel_provider.dart';
+import 'package:tubetube/features/auth/provider/user_provider.dart';
 import 'package:tubetube/features/content/Long_video/parts/post.dart';
 import 'package:tubetube/features/content/short_video/pages/short_video_post.dart';
 
@@ -92,17 +93,46 @@ class _TabPagesState extends State<TabPages> {
                   .watch(eachChannelShortVideosProvider(widget.Userid))
                   .when(
                     data: (shorts) => ListView.builder(
-                      itemCount: shorts.length,
-                      itemBuilder: (context, index) =>
-                          ShortPost(video: shorts[index]),
+                      itemCount: shorts.length, // Danh sách các video
+                      itemBuilder: (context, index) {
+                        final video = shorts[index]; // Lấy video ở vị trí index
+                        return ShortPost(
+                          key: ValueKey(video.shortvideoId), // Đảm bảo Key duy nhất cho mỗi video
+                          video: video,
+                        );
+                      },
                     ),
                     error: (error, stackTrace) => const ErrorPage(),
                     loading: () => const Loader(),
                   );
             },
           ),
-          const Center(
-            child: Text("About"),
+          Consumer(
+            builder: (context, ref, child) {
+              return ref
+                  .watch(anyUserDataProvider(widget.Userid))
+                  .when(
+                data: (user) => Padding(
+                  padding: const EdgeInsets.only(top: 20,left: 10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Mô Tả:",style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold),),
+                      Text(
+                        user.description.isEmpty ? "Không có mô tả" :user.description,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                error: (error, stackTrace) => const ErrorPage(),
+                loading: () => const Loader(),
+              );
+            },
           ),
         ],
       ),

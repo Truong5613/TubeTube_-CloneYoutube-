@@ -4,14 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tubetube/cores/firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
 import 'package:tubetube/features/auth/pages/username_page.dart';
-import 'package:tubetube/features/channel/my_channel/pages/channel_setting.dart';
-
-import 'package:tubetube/features/channel/my_channel/pages/my_channel_screen.dart';
-import 'package:tubetube/features/channel/users_channel/user_channel_page.dart';
-import 'package:tubetube/features/upload/long_video/video_details_page.dart';
 import 'package:tubetube/home_page.dart';
 
 

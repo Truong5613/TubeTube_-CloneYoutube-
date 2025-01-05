@@ -1,14 +1,13 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first, prefer_const_constructors, prefer_const_literals_to_create_immutables
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:flutter/material.dart';
 import 'package:tubetube/cores/colors.dart';
 import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
-import 'package:tubetube/cores/widgets/flat_button.dart';
 import 'package:tubetube/features/Model/comment_model.dart';
 import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/Repository/subcribe_respository.dart';
@@ -20,7 +19,6 @@ import 'package:tubetube/features/content/comment/comment_provider.dart';
 import 'package:tubetube/features/content/comment/comment_sheet.dart';
 import 'package:tubetube/features/Model/video_model.dart';
 import 'package:tubetube/features/content/Long_video/Widget/video_externel_button.dart';
-import 'package:tubetube/features/upload/long_video/video_details_page.dart';
 import 'package:tubetube/features/upload/long_video/video_repository.dart';
 import 'package:video_player/video_player.dart';
 
@@ -40,15 +38,14 @@ class _VideoState extends ConsumerState<Video> {
   bool isShowIcons = true;
   bool isPlaying = false;
   VideoPlayerController? _controller;
-
+  bool isSub = false;
   @override
   void initState() {
     timeago.setLocaleMessages('vi', timeago.ViMessages());
     super.initState();
     _controller = VideoPlayerController.networkUrl(
       Uri.parse(widget.video.videoUrl),
-    )
-      ..initialize().then((_) {
+    )..initialize().then((_) {
         setState(() {});
       });
   }
@@ -87,17 +84,30 @@ class _VideoState extends ConsumerState<Video> {
         widget.video.likes.add(FirebaseAuth.instance.currentUser!.uid);
       }
     });
-
-    await ref.read(longVideoProvider).likeVideo(
-        likes: widget.video.likes,
-        videoId: widget.video.videoId,
-        currentUserId: FirebaseAuth.instance.currentUser!.uid);
+    await ref.watch(longVideoProvider).likeVideo(
+      likes: widget.video.likes,
+      videoId: widget.video.videoId,
+      currentUserId: FirebaseAuth.instance.currentUser!.uid,
+    );
+    ref.refresh(longVideoProvider);
   }
 
+  Future<void> shareVideo(String videoUrl, String title) async {
+    await FlutterShare.share(
+      title: title,
+      text: 'Hãy xem video ${widget.video.title} này!!!!',
+      linkUrl: videoUrl,
+      chooserTitle: 'Chia sẻ Video này ',
+    );
+  }
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<UserModel> user =
-    ref.watch(anyUserDataProvider(widget.video.userId));
+
+    final user = ref.watch(anyUserDataProvider(widget.video.userId));
+    final AsyncValue<UserModel> currentuser = ref.watch(currentUserProvider);
+
+    isSub = user.value!.subscriptions.contains(FirebaseAuth.instance.currentUser!.uid);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey,
@@ -106,101 +116,101 @@ class _VideoState extends ConsumerState<Video> {
           preferredSize: const Size.fromHeight(176),
           child: _controller!.value.isInitialized
               ? AspectRatio(
-            aspectRatio: _controller!.value.aspectRatio,
-            child: GestureDetector(
-              onTap: isShowIcons
-                  ? () {
-                isShowIcons = false;
-                setState(() {});
-              }
-                  : () {
-                isShowIcons = true;
-                setState(() {});
-              },
-              child: Stack(
-                children: [
-                  VideoPlayer(_controller!),
-                  isShowIcons
-                      ? Positioned(
-                    left: 182,
-                    top: 87,
-                    child: GestureDetector(
-                      onTap: () {
-                        toggleVideoPlayer();
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        child: Image.asset(
-                          "assets/images/play.png",
-                          color: Colors.white,
-                        ),
-                      ),
+                  aspectRatio: _controller!.value.aspectRatio,
+                  child: GestureDetector(
+                    onTap: isShowIcons
+                        ? () {
+                            isShowIcons = false;
+                            setState(() {});
+                          }
+                        : () {
+                            isShowIcons = true;
+                            setState(() {});
+                          },
+                    child: Stack(
+                      children: [
+                        VideoPlayer(_controller!),
+                        isShowIcons
+                            ? Positioned(
+                                left: 182,
+                                top: 87,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    toggleVideoPlayer();
+                                  },
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Image.asset(
+                                      "assets/images/play.png",
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
+                        isShowIcons
+                            ? Positioned(
+                                left: 55,
+                                top: 87,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    goBackward();
+                                  },
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Image.asset(
+                                      "assets/images/go_back_final.png",
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
+                        isShowIcons
+                            ? Positioned(
+                                right: 55,
+                                top: 87,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    goForward();
+                                  },
+                                  child: SizedBox(
+                                    height: 50,
+                                    child: Image.asset(
+                                      "assets/images/go_ahead_final.png",
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
+                        isShowIcons
+                            ? Align(
+                                alignment: Alignment.bottomCenter,
+                                child: SizedBox(
+                                  height: 10,
+                                  child: VideoProgressIndicator(
+                                    _controller!,
+                                    allowScrubbing: true,
+                                    colors:const VideoProgressColors(
+                                      playedColor: Colors.red,
+                                      bufferedColor: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : SizedBox(),
+                      ],
                     ),
-                  )
-                      : SizedBox(),
-                  isShowIcons
-                      ? Positioned(
-                    left: 55,
-                    top: 87,
-                    child: GestureDetector(
-                      onTap: () {
-                        goBackward();
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        child: Image.asset(
-                          "assets/images/go_back_final.png",
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  )
-                      : SizedBox(),
-                  isShowIcons
-                      ? Positioned(
-                    right: 55,
-                    top: 87,
-                    child: GestureDetector(
-                      onTap: () {
-                        goForward();
-                      },
-                      child: SizedBox(
-                        height: 50,
-                        child: Image.asset(
-                          "assets/images/go_ahead_final.png",
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  )
-                      : SizedBox(),
-                  isShowIcons
-                      ? Align(
-                    alignment: Alignment.bottomCenter,
-                    child: SizedBox(
-                      height: 10,
-                      child: VideoProgressIndicator(
-                        _controller!,
-                        allowScrubbing: true,
-                        colors: VideoProgressColors(
-                          playedColor: Colors.red,
-                          bufferedColor: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  )
-                      : SizedBox(),
-                ],
-              ),
-            ),
-          )
-              : Padding(
-            padding: EdgeInsets.only(bottom: 100),
-            child: CircularProgressIndicator(
-              color: Colors.red,
-              strokeWidth: 4,
-            ),
-          ),
+                  ),
+                )
+              :const Padding(
+                  padding:const EdgeInsets.only(bottom: 100),
+                  child: CircularProgressIndicator(
+                    color: Colors.red,
+                    strokeWidth: 4,
+                  ),
+                ),
         ),
       ),
       body: SafeArea(
@@ -260,14 +270,16 @@ class _VideoState extends ConsumerState<Video> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => UserChannelPage(userId: widget.video.userId),
+                          builder: (context) =>
+                              UserChannelPage(userId: widget.video.userId),
                         ),
                       );
                     },
                     child: CircleAvatar(
                       radius: 14,
                       backgroundColor: Colors.grey,
-                      backgroundImage: CachedNetworkImageProvider(user.value!.profilePic),
+                      backgroundImage:
+                          CachedNetworkImageProvider(user.value!.profilePic),
                     ),
                   ),
                   Padding(
@@ -294,24 +306,46 @@ class _VideoState extends ConsumerState<Video> {
                   const Spacer(),
                   SizedBox(
                     height: 35,
-                    width: 100,
+                    width: 120,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: (FirebaseAuth.instance.currentUser!.uid != user.value!.userId)
                           ? ElevatedButton(
                         onPressed: () async {
-                          await ref.watch(subscribeChannelProvider).subscribeChannel(
-                            userId: user.value!.userId,
-                            currentUserId: FirebaseAuth.instance.currentUser!.uid,
-                            subscriptions: user.value!.subscriptions,
-                          );
+                          // If already subscribed, unsubscribe
+                          if (user.value!.subscriptions.contains(FirebaseAuth.instance.currentUser!.uid)) {
+                            isSub = false;
+                            await ref.watch(subscribeChannelProvider).unsubscribeChannel(
+                              userId: widget.video.userId,
+                              currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                              subscriptions: user.value!.subscriptions,
+                              ref: ref,
+                            );
+                            setState(() {});
+                          }
+                          // If not subscribed, subscribe
+                          else {
+                            isSub = true;
+                            await ref.watch(subscribeChannelProvider).subscribeChannel(
+                              userId: widget.video.userId,
+                              currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                              subscriptions: user.value!.subscriptions,
+                              ref: ref,
+                            );
+                            setState(() {});
+                          }
                         },
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                        child: const Text("ĐĂNG KÝ"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSub ? Colors.grey : Colors.red,
+                        ),
+                        child: Text(
+                          isSub ? "ĐÃ ĐĂNG KÝ" : "ĐĂNG KÝ",
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
                       )
-                          : const SizedBox(), // Ẩn nếu là user của chính mình
+                          : const SizedBox(),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -335,16 +369,18 @@ class _VideoState extends ConsumerState<Video> {
                       child: Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(right: 5),
-                            child: Text("${widget.video.likes.length}",
-                              style: TextStyle(fontSize: 16),),
+                            padding: const EdgeInsets.only(left: 10, right: 5),
+                            child: Text(
+                              "${widget.video.likes.length}",
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
                           GestureDetector(
                             onTap: likeVideo,
                             child: Icon(
                               Icons.favorite,
                               color: widget.video.likes.contains(
-                                  FirebaseAuth.instance.currentUser!.uid)
+                                      FirebaseAuth.instance.currentUser!.uid)
                                   ? Colors.red
                                   : Colors.black,
                               size: 20,
@@ -353,21 +389,22 @@ class _VideoState extends ConsumerState<Video> {
                         ],
                       ),
                     ),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 9, right: 9),
                       child: VideoExtraButton(
-                        text: "Share",
+                        onPressed: () async {
+                          await shareVideo(
+                              widget.video.videoUrl, widget.video.title);
+                        },
+                        text: "Chia Sẻ",
                         iconData: Icons.share,
                       ),
                     ),
-                    const VideoExtraButton(
-                      text: "Remix",
-                      iconData: Icons.analytics_outlined,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(left: 9, right: 9),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 9, right: 9),
                       child: VideoExtraButton(
-                        text: "Download",
+                        onPressed: () async {},
+                        text: "Tải Xuống",
                         iconData: Icons.download,
                       ),
                     ),
@@ -397,15 +434,15 @@ class _VideoState extends ConsumerState<Video> {
                       ),
                       height: 120,
                       width: double.infinity,
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Consumer(
                             builder: (context, ref, child) {
                               final AsyncValue<List<CommentModel>> comments =
-                              ref.watch(
+                                  ref.watch(
                                 commentsProvider(widget.video.videoId),
                               );
                               if (comments.value!.isEmpty) {
@@ -428,7 +465,7 @@ class _VideoState extends ConsumerState<Video> {
                                   radius: 15,
                                   backgroundColor: Colors.grey,
                                   backgroundImage: CachedNetworkImageProvider(
-                                    user.value!.profilePic,
+                                    currentuser.value!.profilePic,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -480,7 +517,7 @@ class _VideoState extends ConsumerState<Video> {
                   final videos = videosMap
                       .map(
                         (video) => VideoModel.fromMap(video.data()),
-                  )
+                      )
                       .toList();
                   return ListView.builder(
                     physics: const NeverScrollableScrollPhysics(),

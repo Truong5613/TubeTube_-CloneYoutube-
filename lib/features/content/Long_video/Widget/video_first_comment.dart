@@ -41,7 +41,7 @@ class VideoFirstComment extends StatelessWidget {
                 radius: 14,
                 backgroundColor: Colors.grey,
                 backgroundImage: CachedNetworkImageProvider(
-                  user.profilePic,
+                  comments[0].profilePic,
                 ),
               ),
               const SizedBox(width: 7),

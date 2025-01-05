@@ -7,6 +7,7 @@ class CommentModel {
   final String displayName;
   final String profilePic;
   final DateTime time;
+  final String uid;
 
   CommentModel({
     required this.commentText,
@@ -15,6 +16,7 @@ class CommentModel {
     required this.displayName,
     required this.profilePic,
     required this.time,
+    required this.uid,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,6 +27,7 @@ class CommentModel {
       'displayName': displayName,
       'profilePic': profilePic,
       'time': time,
+      'uid': uid,
     };
   }
 
@@ -40,6 +43,7 @@ class CommentModel {
           : DateTime.fromMillisecondsSinceEpoch(
         map["time"] as int,
       ),
+      uid: map['uid'] as String,
     );
   }
 }

@@ -1,13 +1,12 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tubetube/cores/widgets/flat_button.dart';
 import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/Repository/subcribe_respository.dart';
+import 'package:tubetube/features/auth/provider/user_provider.dart';
+import 'package:tubetube/features/channel/my_channel/pages/my_channel_screen.dart';
 import 'package:tubetube/features/channel/users_channel/user_channel_page.dart';
-
 
 class SearchChannelTile extends ConsumerWidget {
   final UserModel user;
@@ -18,19 +17,33 @@ class SearchChannelTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final AsyncValue<UserModel> currentuser = ref.watch(currentUserProvider);
+    bool isSub = user.subscriptions.contains(FirebaseAuth.instance.currentUser!.uid);
+
     return Padding(
       padding: const EdgeInsets.only(top: 10, left: 10),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserChannelPage(userId: user.userId,
-
+          final currentUser = FirebaseAuth.instance.currentUser;
+          if (currentUser != null && user.userId == currentUser.uid) {
+            // Nếu là chính tài khoản người dùng, chuyển sang trang MyUserPage
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyChannelScreen(), // Trang cá nhân của người dùng
               ),
-            ),
-          );
+            );
+          } else {
+            // Nếu không phải, chuyển sang trang UserChannelPage
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserChannelPage(userId: user.userId),
+              ),
+            );
+          }
         },
+
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -60,29 +73,50 @@ class SearchChannelTile extends ConsumerWidget {
                   ),
                   Text(
                     user.subscriptions.isEmpty
-                        ? "No subscription"
-                        : "${user.subscriptions.length} subscriptions",
+                        ? "0 ĐĂNG KÝ"
+                        : "${user.subscriptions.length} đăng ký",
                     style: const TextStyle(
                       color: Colors.blueGrey,
                     ),
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
-                    height: 40,
-                    width: 110,
-                    child: FlatButton(
-                      text: "Subscribe",
-                      onPressed: () async {
-                        await ref.watch(subscribeChannelProvider).subscribeChannel(
-                            userId:user.userId ,
-                            currentUserId: FirebaseAuth.instance.currentUser!.uid,
-                            subscriptions: user.subscriptions);
-
-
-                      },
-                      colour: Colors.black,
+                    height: 35,
+                    width: 120,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: (FirebaseAuth.instance.currentUser!.uid != user.userId)
+                          ? ElevatedButton(
+                        onPressed: () async {
+                          if (isSub) {
+                            await ref.watch(subscribeChannelProvider).unsubscribeChannel(
+                              userId: user.userId,
+                              currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                              subscriptions: user.subscriptions,
+                              ref: ref,
+                            );
+                          }
+                          else {
+                            await ref.watch(subscribeChannelProvider).subscribeChannel(
+                              userId: user.userId,
+                              currentUserId: FirebaseAuth.instance.currentUser!.uid,
+                              subscriptions: user.subscriptions,
+                              ref: ref,
+                            );
+                          }
+                          ref.refresh(subscribeChannelProvider);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSub ? Colors.grey : Colors.red,
+                        ),
+                        child: Text(
+                          isSub ? "ĐÃ ĐĂNG KÝ" : "ĐĂNG KÝ",
+                          style: const TextStyle(color: Colors.white, fontSize: 10),
+                        ),
+                      )
+                          : const SizedBox(),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),

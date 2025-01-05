@@ -16,20 +16,21 @@ class ShortPost extends StatelessWidget {
   // Lấy thumbnail từ video URL
   Future<String?> _getThumbnail(String videoUrl) async {
     try {
-      // Generate thumbnail for the video URL
+      final tempDir = await getTemporaryDirectory();
+      final fileName = "${video.hashCode}_${video.shortvideoId}.png"; // Tạo tên file duy nhất
       final thumbnail = await VideoThumbnail.thumbnailFile(
         video: videoUrl,
-        thumbnailPath: (await getTemporaryDirectory()).path,
-        // Save temporarily
+        thumbnailPath: "${tempDir.path}/$fileName",
         imageFormat: ImageFormat.PNG,
         quality: 75,
-        timeMs: 5000, // Capture thumbnail at 5 seconds
+        timeMs: 5000,
       );
-      return thumbnail; // Return the file path of the thumbnail
+      return thumbnail;
     } catch (e) {
-      return null; // Return null if there's an error
+      return null;
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

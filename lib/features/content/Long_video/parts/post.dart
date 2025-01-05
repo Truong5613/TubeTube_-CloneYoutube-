@@ -7,8 +7,10 @@ import 'package:tubetube/features/auth/provider/user_provider.dart';
 import 'package:tubetube/features/content/Long_video/parts/video.dart';
 import 'package:tubetube/features/Model/video_model.dart';
 import 'package:timeago/timeago.dart' as timeago;
+
 class Post extends ConsumerWidget {
   final VideoModel video;
+
   const Post({
     Key? key,
     required this.video,
@@ -16,13 +18,18 @@ class Post extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Set Vietnamese locale for time ago formatting
     timeago.setLocaleMessages('vi', timeago.ViMessages());
+
+    // Fetch user data using the userId associated with the video
     final AsyncValue<UserModel> userModel =
     ref.watch(anyUserDataProvider(video.userId));
 
     final user = userModel.whenData((user) => user);
+
     return GestureDetector(
       onTap: () async {
+        // Navigate to the video detail page
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -32,6 +39,7 @@ class Post extends ConsumerWidget {
           ),
         );
 
+        // Increment the view count in Firestore
         await FirebaseFirestore.instance
             .collection("videos")
             .doc(video.videoId)
@@ -45,10 +53,10 @@ class Post extends ConsumerWidget {
         padding: const EdgeInsets.only(bottom: 8),
         child: Column(
           children: [
+            // Display video thumbnail
             CachedNetworkImage(
               imageUrl: video.thumbnail,
             ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -57,8 +65,9 @@ class Post extends ConsumerWidget {
                   child: CircleAvatar(
                     radius: 25,
                     backgroundColor: Colors.grey,
+                    // Display user profile image
                     backgroundImage: CachedNetworkImageProvider(
-                      user.value!.profilePic,
+                      user.value?.profilePic ?? '', // Handle null case
                     ),
                   ),
                 ),
@@ -76,13 +85,12 @@ class Post extends ConsumerWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(
-                        left: 10,top: 5
-                      ),
+                      padding: EdgeInsets.only(left: 10, top: 5),
                       child: Row(
                         children: [
+                          // Display user name
                           Text(
-                            user.value!.displayName,
+                            user.value?.displayName ?? 'Unknown', // Handle null case
                             style: const TextStyle(
                               color: Colors.blueGrey,
                             ),
@@ -90,14 +98,17 @@ class Post extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             child: Text(
-                              video.views == 0 ? "0 lượt xem" : "${video.views} lượt xem",
+                              video.views == 0
+                                  ? "0 lượt xem"
+                                  : "${video.views} lượt xem",
                               style: const TextStyle(
                                 color: Colors.blueGrey,
                               ),
                             ),
                           ),
+                          // Display time ago
                           Text(
-                            timeago.format(video.datePublished,locale: 'vi'),
+                            timeago.format(video.datePublished, locale: 'vi'),
                             style: const TextStyle(
                               color: Colors.blueGrey,
                             ),
@@ -109,7 +120,9 @@ class Post extends ConsumerWidget {
                 ),
                 const Spacer(),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // You can implement more actions here if needed
+                  },
                   icon: const Icon(Icons.more_vert),
                 ),
               ],

@@ -51,7 +51,7 @@ class VideoRepository {
     required videoId,
     required currentUserId,
   }) async {
-    if (!likes!.contains(currentUserId)) {
+    if (likes!.contains(currentUserId)) {
       await FirebaseFirestore.instance
           .collection("videos")
           .doc(videoId)
@@ -59,7 +59,7 @@ class VideoRepository {
         "likes": FieldValue.arrayUnion([currentUserId])
       });
     }
-    if (likes.contains(currentUserId)) {
+    if (!likes.contains(currentUserId)) {
       await FirebaseFirestore.instance
           .collection("videos")
           .doc(videoId)

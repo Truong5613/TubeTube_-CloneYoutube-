@@ -18,8 +18,8 @@ class PageTabBar extends StatelessWidget {
         tabs: [
           Text("Home"),
           Text("Videos"),
-          Text("shorts"),
-          Text("about"),
+          Text("Shorts"),
+          Text("About"),
         ],
       ),
     );

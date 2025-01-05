@@ -64,7 +64,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                   SizedBox(
                     height: 50,
-                    width: 290,
+                    width: 270,
                     child: TextFormField(
                       onChanged: (value) async {
                         await filterList(value);
