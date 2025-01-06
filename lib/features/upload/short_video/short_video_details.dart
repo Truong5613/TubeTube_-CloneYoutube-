@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/cores/method.dart';
 import 'package:tubetube/cores/widgets/flat_button.dart';
-import 'package:tubetube/features/upload/short_video/short_video_repository.dart';
+import 'package:tubetube/features/Provider&Repository/short_video_repository.dart';
 import 'package:tubetube/home_page.dart';
 import 'package:uuid/uuid.dart';
 

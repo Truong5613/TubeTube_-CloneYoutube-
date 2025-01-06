@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
-import 'package:tubetube/features/auth/provider/user_provider.dart';
-import 'package:tubetube/features/channel/my_channel/repository/User_Repository.dart';
+import 'package:tubetube/features/Provider&Repository/user_provider.dart';
+import 'package:tubetube/features/Provider&Repository/User_Repository.dart';
 import 'package:tubetube/features/channel/my_channel/widgets/edit_setting_dialog.dart';
 import 'package:tubetube/features/channel/my_channel/widgets/setting_field_item.dart';
 
@@ -138,4 +138,5 @@ class _MyChannelSettingsState extends ConsumerState<MyChannelSettings> {
       loading: () => const Loader(),
     );
   }
+
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/features/Model/short_video_model.dart';
 import 'package:tubetube/features/Model/user_model.dart';
-import 'package:tubetube/features/auth/provider/user_provider.dart';
+import 'package:tubetube/features/Provider&Repository/user_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:timeago/timeago.dart' as timeago;
 

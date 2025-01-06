@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/cores/screens/error_page.dart';
 import 'package:tubetube/cores/screens/loader.dart';
 import 'package:tubetube/features/Model/comment_model.dart';
-import 'package:tubetube/features/auth/provider/user_provider.dart';
+import 'package:tubetube/features/Provider&Repository/user_provider.dart';
 import 'package:tubetube/features/content/comment/comment_tile.dart';
 import 'package:tubetube/features/upload/comments/comment_Repository.dart';
 import 'package:tubetube/features/Model/video_model.dart';

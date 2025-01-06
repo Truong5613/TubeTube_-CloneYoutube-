@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/cores/widgets/custom_button.dart';
 import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/Model/video_model.dart';
-import 'package:tubetube/features/Provider/search_provider.dart';
+import 'package:tubetube/features/Provider&Repository/search_provider.dart';
 import 'package:tubetube/features/Search/widgets/search_channel_tile.dart';
 import 'package:tubetube/features/content/Long_video/parts/post.dart';
 import 'package:tubetube/features/content/bottom_navigation.dart';
@@ -18,26 +18,34 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   List foundItems = [];
+  bool isLoading = false;
 
   filterList(String keyWordSelected) async {
+    setState(() {
+      isLoading = true;
+    });
+
     List results = [];
     List<UserModel> users = await ref.watch(allChannelsProvider);
     List<VideoModel> videos = await ref.watch(allVideoProvider);
+
     final foundChannels = users.where((user) {
       return user.displayName
           .toString()
           .toLowerCase()
-          .contains(keyWordSelected);
+          .contains(keyWordSelected.toLowerCase());
     }).toList();
     results.addAll(foundChannels);
+
     final foundVideos = videos.where((video) {
-      return video.title.toString().toLowerCase().contains(keyWordSelected);
+      return video.title.toString().toLowerCase().contains(keyWordSelected.toLowerCase());
     }).toList();
     results.addAll(foundVideos);
 
     setState(() {
-      results.shuffle();
+      results.shuffle(); // Only shuffle if you want random results
       foundItems = results;
+      isLoading = false;
     });
   }
 
@@ -72,22 +80,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       decoration: InputDecoration(
                         hintText: "Tìm kiếm ...",
                         border: OutlineInputBorder(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(18)),
+                          borderRadius: const BorderRadius.all(Radius.circular(18)),
                           borderSide: BorderSide(
                             color: Colors.grey.shade200,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(18)),
+                          borderRadius: const BorderRadius.all(Radius.circular(18)),
                           borderSide: BorderSide(
                             color: Colors.grey.shade200,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(18)),
+                          borderRadius: const BorderRadius.all(Radius.circular(18)),
                           borderSide: BorderSide(
                             color: Colors.grey.shade200,
                           ),
@@ -95,8 +100,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         filled: true,
                         fillColor: const Color(0xfff2f2f2),
                         contentPadding: EdgeInsets.only(left: 13, bottom: 12),
-                        hintStyle: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500),
+                        hintStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                       ),
                     ),
                   ),
@@ -105,28 +109,32 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     width: 65,
                     child: CustomButton(
                         iconData: Icons.search, onTap: () {}, haveColor: true),
-                  )
+                  ),
                 ],
               ),
-              Expanded(
+              isLoading
+                  ? Center(child: CircularProgressIndicator()) // Loading indicator
+                  : Expanded(
                 child: ListView.builder(
                   itemCount: foundItems.length,
                   itemBuilder: (context, index) {
-                    List<Widget> itemsWidget = [];
                     final selectedItem = foundItems[index];
+                    List<Widget> itemsWidget = [];
+
                     if (selectedItem.type == "video") {
                       itemsWidget.add(Post(video: selectedItem));
                     }
                     if (selectedItem.type == "user") {
                       itemsWidget.add(SearchChannelTile(user: selectedItem));
                     }
-                    if (foundItems.isEmpty) {
-                      return const SizedBox();
+                    if (selectedItem.type == "admin") {
+                      itemsWidget.add(SearchChannelTile(user: selectedItem));
                     }
-                    return itemsWidget[0];
+
+                    return itemsWidget.isNotEmpty ? itemsWidget[0] : SizedBox();
                   },
                 ),
-              )
+              ),
             ],
           ),
         ),

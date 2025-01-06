@@ -6,9 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tubetube/features/Model/short_video_model.dart';
 import 'package:tubetube/features/Model/video_model.dart';
-import 'package:tubetube/features/Provider/channel_provider.dart';
+import 'package:tubetube/features/Provider&Repository/channel_provider.dart';
+import 'package:tubetube/features/Provider&Repository/user_provider.dart';
 import 'package:tubetube/features/Repository/subcribe_respository.dart';
-import 'package:tubetube/features/auth/provider/user_provider.dart';
 import 'package:tubetube/features/content/Long_video/parts/post.dart';
 import 'package:tubetube/features/content/short_video/pages/short_video_post.dart';
 

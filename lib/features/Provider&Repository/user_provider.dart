@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/features/Model/user_model.dart';
-import 'package:tubetube/features/auth/repository/user_data_service.dart';
+import 'package:tubetube/features/Provider&Repository/user_data_service.dart';
 
 final currentUserProvider = FutureProvider<UserModel>((ref) async {
   final UserModel user =

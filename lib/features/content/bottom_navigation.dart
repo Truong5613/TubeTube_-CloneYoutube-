@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tubetube/features/auth/pages/logout_page.dart';
 
 class BottomNavigation extends StatefulWidget {
   final Function(int index) onPressed;
@@ -14,6 +17,34 @@ class BottomNavigation extends StatefulWidget {
 
 class _BottomNavigationState extends State<BottomNavigation> {
   int currentIndex = 0;
+
+  Future<void> _confirmLogout() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận đăng xuất'),
+        content: const Text('Bạn có muốn đăng xuất không?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false), // Đóng và không logout
+            child: const Text('Không'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true), // Xác nhận logout
+            child: const Text('Có'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      await GoogleSignIn().signOut(); // Đăng xuất Google
+      await FirebaseAuth.instance.signOut(); // Đăng xuất Firebase
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đăng xuất thành công!')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,15 +83,19 @@ class _BottomNavigationState extends State<BottomNavigation> {
         tabs: const [
           GButton(icon: Icons.home, text: "Home"),
           GButton(icon: Icons.videocam, text: "Shorts"),
-          GButton(icon: Icons.cloud_upload, text: "Upload"),
-          GButton(icon: Icons.search, text: "Search"),
-          GButton(icon: Icons.logout, text: "Log out"),
+          GButton(icon: Icons.cloud_upload),
+          GButton(icon: Icons.search, text: "Search",textStyle: TextStyle(fontSize: 12),),
+          GButton(icon: Icons.logout),
         ],
         onTabChange: (index) {
           setState(() {
             currentIndex = index;
           });
-          widget.onPressed(index);
+          if (index == 4) {
+            _confirmLogout(); // Hộp thoại xác nhận khi nhấn logout
+          } else {
+            widget.onPressed(index);
+          }
         },
         selectedIndex: currentIndex,
       ),

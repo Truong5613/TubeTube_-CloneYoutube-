@@ -102,8 +102,8 @@ class _CommentTileState extends ConsumerState<CommentTile> {
 
   // Xây dựng các tùy chọn menu dựa trên vai trò của người dùng
   List<PopupMenuEntry<String>> _buildMenuOptions() {
-    if (widget.currentUserId == widget.videoOwnerId) {
-      // Chủ sở hữu video
+    if (widget.currentUserId == widget.comment.uid) {
+      // Người dùng bình thường nhưng là chủ sở hữu bình luận
       return [
         const PopupMenuItem<String>(
           value: 'delete',
@@ -114,15 +114,17 @@ class _CommentTileState extends ConsumerState<CommentTile> {
           child: Text('Sửa bình luận'),
         ),
       ];
-    } else if (widget.currentUserId == widget.comment.uid) {
-      // Người dùng bình thường nhưng là chủ sở hữu bình luận
+    } else if (widget.currentUserId == widget.videoOwnerId) {
+      // Chủ sở hữu video
       return [
         const PopupMenuItem<String>(
-          value: 'edit',
-          child: Text('Sửa bình luận'),
+          value: 'delete',
+          child: Text('Xóa bình luận'),
         ),
+
       ];
     }
+
     return [];
   }
 

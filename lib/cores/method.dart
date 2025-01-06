@@ -86,3 +86,32 @@ Future pickShortVideo(BuildContext context) async {
     showErrorSnackBar('Failed to pick video: $e', context);
   }
 }
+Future<void> deleteFileInStorage(String number, String fileType) async {
+  final ref = FirebaseStorage.instance.ref().child("$fileType/$number");
+
+  try {
+    // Delete the file from storage
+    await ref.delete();
+    print('File deleted successfully');
+  } catch (e) {
+    print('Error deleting file: $e');
+    throw Exception('Failed to delete file');
+  }
+}
+Future<void> deleteFileFromUrl(String url) async {
+  try {
+    // Extract the file path from the URL
+    final Uri uri = Uri.parse(url);
+    final String filePath = Uri.decodeFull(uri.pathSegments.last);
+
+    // Get a reference to the file in Firebase Storage
+    final ref = FirebaseStorage.instance.ref().child(filePath);
+
+    // Delete the file from Firebase Storage
+    await ref.delete();
+    print('File deleted successfully');
+  } catch (e) {
+    print('Error deleting file: $e');
+    throw Exception('Failed to delete file');
+  }
+}

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tubetube/features/auth/provider/user_provider.dart';
+import 'package:tubetube/features/Provider&Repository/user_provider.dart';
 final editSettingsProvider = Provider(
       (ref) => EditSettingsField(
     firestore: FirebaseFirestore.instance,

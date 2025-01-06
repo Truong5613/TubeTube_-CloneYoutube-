@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/cores/widgets/flat_button.dart';
-import 'package:tubetube/features/auth/repository/auth_service.dart';
-import 'package:tubetube/features/auth/repository/user_data_service.dart';
+import 'package:tubetube/features/Provider&Repository/auth_service.dart';
+import 'package:tubetube/features/Provider&Repository/user_data_service.dart';
 
 final formKey = GlobalKey<FormState>();
 

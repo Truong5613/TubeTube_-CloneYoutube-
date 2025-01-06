@@ -10,6 +10,9 @@ class VideoModel {
   final String userId;
   final List likes;
   final String type;
+  final bool isHidden;
+  final bool isBanned;
+  final String description;
   VideoModel({
     required this.videoUrl,
     required this.thumbnail,
@@ -20,6 +23,9 @@ class VideoModel {
     required this.userId,
     required this.likes,
     required this.type,
+    required this.isHidden,
+    required this.isBanned,
+    required this.description,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +39,9 @@ class VideoModel {
       'userId': userId,
       'likes': likes,
       'type': type,
+      'isHidden': isHidden,
+      'isBanned': isBanned,
+      'description': description,
     };
   }
 
@@ -53,6 +62,9 @@ class VideoModel {
         (map['likes'] as List),
       ),
       type: map['type'] as String,
+      isHidden: map['isHidden'] as bool,
+      isBanned: map['isBanned'] as bool,
+      description: map['description'] as String,
     );
   }
 }
