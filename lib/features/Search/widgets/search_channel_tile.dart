@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/features/Model/user_model.dart';
 import 'package:tubetube/features/Provider&Repository/user_provider.dart';
-import 'package:tubetube/features/Repository/subcribe_respository.dart';
+import 'package:tubetube/features/Provider&Repository/subcribe_respository.dart';
 import 'package:tubetube/features/channel/my_channel/pages/my_channel_screen.dart';
 import 'package:tubetube/features/channel/users_channel/user_channel_page.dart';
 
@@ -104,7 +104,6 @@ class SearchChannelTile extends ConsumerWidget {
                               ref: ref,
                             );
                           }
-                          ref.refresh(subscribeChannelProvider);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: isSub ? Colors.grey : Colors.red,

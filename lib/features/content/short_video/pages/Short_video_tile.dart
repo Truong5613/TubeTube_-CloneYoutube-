@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tubetube/features/Model/short_video_model.dart';
 import 'package:tubetube/features/Model/user_model.dart';
+import 'package:tubetube/features/Provider&Repository/short_video_repository.dart';
 import 'package:tubetube/features/Provider&Repository/user_provider.dart';
+import 'package:tubetube/features/content/comment/comment_sheet_shortvideo.dart';
 import 'package:video_player/video_player.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -17,8 +20,9 @@ class ShortVideoTile extends ConsumerStatefulWidget {
 
 class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
   late VideoPlayerController shortVideoController;
-  bool isMuted = false; // Âm thanh tắt mặc định
-  bool isPlaying = true; // Video phát mặc định
+  bool isMuted = false; // Mute sound by default
+  bool isPlaying = true; // Video plays by default
+  bool _isCaptionExpanded = false; // Track if the caption is expanded
 
   @override
   void initState() {
@@ -29,7 +33,7 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
         setState(() {});
         shortVideoController.play();
         shortVideoController.setLooping(true);
-        shortVideoController.setVolume(1); // Tắt âm thanh mặc định
+        shortVideoController.setVolume(1); // Mute by default
       });
   }
 
@@ -57,10 +61,34 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
     });
   }
 
+  void toggleCaption() {
+    setState(() {
+      _isCaptionExpanded = !_isCaptionExpanded;
+    });
+  }
+
+  likeVideo() async {
+    setState(() {
+      if (widget.shortVideo.likes.contains(FirebaseAuth.instance.currentUser!.uid)) {
+        widget.shortVideo.likes.remove(FirebaseAuth.instance.currentUser!.uid);
+      } else {
+        widget.shortVideo.likes.add(FirebaseAuth.instance.currentUser!.uid);
+      }
+    });
+    await ref.watch(shortVideoProvider).likeShortVideo(
+      likes: widget.shortVideo.likes,
+      shortvideoId: widget.shortVideo.shortvideoId,
+      currentUserId: FirebaseAuth.instance.currentUser!.uid,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final AsyncValue<UserModel> user =
-    ref.watch(anyUserDataProvider(widget.shortVideo.userId));
+    final AsyncValue<UserModel> user = ref.watch(anyUserDataProvider(widget.shortVideo.userId));
+    if(widget.shortVideo.isHidden || widget.shortVideo.isBanned){
+      return const SizedBox();
+    }
+
 
     return Stack(
       children: [
@@ -78,9 +106,7 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
               ),
             ),
           )
-              : Center(
-            child: CircularProgressIndicator(),
-          ),
+              : const Center(child: CircularProgressIndicator()),
         ),
 
         // Overlay for actions and details
@@ -89,18 +115,17 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
           left: 10,
           right: 10,
           child: Container(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3), // Nền mờ
+              color: Colors.black.withOpacity(0.3), // Transparent background
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Caption and User info
+                // Avatar and User info
                 Row(
                   children: [
-                    // Avatar (ensure user data is loaded first)
                     user.when(
                       data: (userData) {
                         return CircleAvatar(
@@ -108,28 +133,27 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
                           radius: 16,
                         );
                       },
-                      loading: () => CircleAvatar(
+                      loading: () => const CircleAvatar(
                         backgroundColor: Colors.grey,
                         radius: 16,
                       ),
-                      error: (error, stackTrace) => CircleAvatar(
+                      error: (error, stackTrace) => const CircleAvatar(
                         backgroundColor: Colors.grey,
                         radius: 16,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    // Username
                     user.when(
                       data: (userData) => Text(
                         userData.displayName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      loading: () => CircularProgressIndicator(),
-                      error: (error, stackTrace) => Text(
+                      loading: () => const CircularProgressIndicator(),
+                      error: (error, stackTrace) => const Text(
                         "Unknown User",
                         style: TextStyle(color: Colors.white),
                       ),
@@ -137,17 +161,29 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Caption text
+                // Caption text with "See More" feature
                 Text(
-                  widget.shortVideo.caption,
-                  style: TextStyle(
+                  _isCaptionExpanded
+                      ? widget.shortVideo.caption
+                      : widget.shortVideo.caption.length > 40
+                      ? '${widget.shortVideo.caption.substring(0, 40)}...'
+                      : widget.shortVideo.caption,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  maxLines: _isCaptionExpanded ? null : 4,
+                  overflow: _isCaptionExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
                 ),
+                if (widget.shortVideo.caption.length > 40) // Caption length threshold
+                  TextButton(
+                    onPressed: toggleCaption,
+                    child: Text(
+                      _isCaptionExpanded ? "Rút Gọn" : "Xem Thêm",
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
                 const SizedBox(height: 10),
                 // Timeago (posted date)
                 Row(
@@ -155,9 +191,8 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
                   children: [
                     Text(
                       timeago.format(widget.shortVideo.datePublished, locale: 'vi'),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
-                    // Volume toggle button
                     IconButton(
                       icon: Icon(
                         isMuted ? Icons.volume_off : Icons.volume_up,
@@ -175,25 +210,34 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
         // Action buttons (like, comment, share)
         Positioned(
           right: 10,
-          bottom: 180,
+          bottom: 250,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.3), // Nền mờ
+              color: Colors.black.withOpacity(0.3), // Transparent background
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
               children: [
                 IconButton(
-                  icon: Icon(Icons.thumb_up, color: Colors.white, size: 30),
-                  onPressed: () {
-                    // Handle like action
-                  },
+                  icon: Icon(Icons.thumb_up,
+                      color: widget.shortVideo.likes.contains(FirebaseAuth.instance.currentUser!.uid)
+                          ? Colors.blue
+                          : Colors.white,
+                      size: 30),
+                  onPressed: likeVideo,
+                ),
+                Text(
+                  "${widget.shortVideo.likes.length}",
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 10),
                 IconButton(
-                  icon: Icon(Icons.comment, color: Colors.white, size: 30),
+                  icon: const Icon(Icons.comment, color: Colors.white, size: 30),
                   onPressed: () {
-                    // Handle comment action
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) => ShortVideoCommentSheet(shortVideo: widget.shortVideo),
+                    );
                   },
                 ),
               ],
@@ -204,10 +248,13 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
         // Play/Pause overlay icon
         if (!isPlaying)
           Center(
-            child: Icon(
-              Icons.play_circle_filled,
-              color: Colors.white.withOpacity(0.7),
-              size: 80,
+            child: IconButton(
+              icon: Icon(
+                Icons.play_circle_filled,
+                color: Colors.white.withOpacity(0.7),
+                size: 70,
+              ),
+              onPressed: togglePlayPause,
             ),
           ),
       ],

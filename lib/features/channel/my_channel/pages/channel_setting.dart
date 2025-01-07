@@ -36,7 +36,7 @@ class _MyChannelSettingsState extends ConsumerState<MyChannelSettings> {
                         height: 170,
                         width: double.infinity,
                         child: Image.asset(
-                          "assets/images/flutter background.png", //################
+                          "assets/images/background.png", //################
                           fit: BoxFit.cover,
                         ),
                       ),

@@ -97,10 +97,6 @@ class _ShortVideoScreenState extends State<ShortVideoScreen> {
                             onPressed: () {},
                             icon: const Icon(Icons.arrow_back),
                           ),
-                          const CircleAvatar(
-                            radius: 18,
-                            backgroundColor: Colors.blueGrey,
-                          )
                         ],
                       ),
                     ),

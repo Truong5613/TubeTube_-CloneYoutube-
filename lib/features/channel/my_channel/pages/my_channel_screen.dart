@@ -33,7 +33,6 @@ class _MyChannelScreenState extends ConsumerState<MyChannelScreen> {
                   // Thong tin TopHeader
                   TopHeader(user: currentUser),
                   const Text("Tổng Quát Kênh Này"),
-                  Buttons(),
                   // Tao Thanh Tab
                   PageTabBar(),
                   TabPages(Userid: FirebaseAuth.instance.currentUser!.uid),

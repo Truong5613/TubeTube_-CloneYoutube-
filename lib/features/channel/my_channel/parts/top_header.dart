@@ -35,8 +35,8 @@ class TopHeader extends StatelessWidget {
               ),
               children: [
                 TextSpan(text: "${user.username}  "),
-                TextSpan(text: "${user.subscriptions.length} subscriptions  "),
-                TextSpan(text: "${user.videos} videos"),
+                TextSpan(text: "${user.subscriptions.length} Đăng ký  "),
+                TextSpan(text: "${user.videos} Video"),
               ],
             ),
           ),

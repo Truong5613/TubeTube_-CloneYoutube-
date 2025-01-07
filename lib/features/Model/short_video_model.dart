@@ -6,7 +6,8 @@ class ShortVideoModel {
   final DateTime datePublished;  // Date when the video was published
   final List likes;  // List of likes for the video
   final String type;  // Type of video (e.g., 'short', 'full', etc.)
-
+  final bool isHidden;
+  final bool isBanned;
   // Constructor with named parameters
   ShortVideoModel({
     required this.shortvideoId,
@@ -16,6 +17,8 @@ class ShortVideoModel {
     required this.datePublished,
     required this.likes,
     required this.type,
+    required this.isHidden,
+    required this.isBanned,
   });
 
   // Convert the object to a Map
@@ -28,6 +31,8 @@ class ShortVideoModel {
       'datePublished': datePublished.millisecondsSinceEpoch,
       'likes': likes,
       'type': type,
+      'isHidden': isHidden,
+      'isBanned': isBanned,
     };
   }
 
@@ -41,6 +46,8 @@ class ShortVideoModel {
       datePublished: DateTime.fromMillisecondsSinceEpoch(map['datePublished'] as int),
       likes: List.from(map['likes'] as List),
       type: map['type'] as String,
+      isHidden: map['isHidden'] as bool,
+      isBanned: map['isBanned'] as bool,
     );
   }
 }

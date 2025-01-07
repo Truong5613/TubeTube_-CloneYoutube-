@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
             Row(
               children: [
                 Image.asset(
-                  "assets/images/youtube.jpg",
+                  "assets/images/TubeTube.png",
                   height: 36,
                 ),
                 const SizedBox(width: 4),

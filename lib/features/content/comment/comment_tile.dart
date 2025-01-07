@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:tubetube/features/Model/comment_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tubetube/features/upload/comments/comment_Repository.dart';
+import 'package:tubetube/features/Provider&Repository/comment_Repository.dart';
 
 class CommentTile extends ConsumerStatefulWidget {
   final CommentModel comment;

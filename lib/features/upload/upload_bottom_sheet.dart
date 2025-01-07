@@ -14,14 +14,14 @@ class CreateBottomSheet extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 7, top: 12),
         child: SizedBox(
-          height: 270,
+          height: 160,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Padding(
                 padding: EdgeInsets.only(left: 10),
                 child: Text(
-                  "Create",
+                  "Hoạt Động Đăng Tải",
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
@@ -32,7 +32,7 @@ class CreateBottomSheet extends StatelessWidget {
               SizedBox(
                 height: 38,
                 child: ImageItem(
-                  itemText: "Create a Short",
+                  itemText: "Tạo Video Ngắn",
                   itemClicked: () async {
                     pickShortVideo(context);
                   },
@@ -44,7 +44,7 @@ class CreateBottomSheet extends StatelessWidget {
               SizedBox(
                 height: 38,
                 child: ImageItem(
-                  itemText: "Upload a Video",
+                  itemText: "Tạo Video Dài",
                   itemClicked: () async {
                     await pickVideo(context);
                   },
@@ -53,25 +53,6 @@ class CreateBottomSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                height: 38,
-                child: ImageItem(
-                  itemText: "Go Live",
-                  itemClicked: () {},
-                  imageName: "go-live.png",
-                  haveColor: true,
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 38,
-                child: ImageItem(
-                  itemText: "Create a post",
-                  itemClicked: () {},
-                  imageName: "create-post.png",
-                  haveColor: true,
-                ),
-              ),
             ],
           ),
         ),
