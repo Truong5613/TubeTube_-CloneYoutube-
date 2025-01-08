@@ -30,6 +30,7 @@ class _VideoDetailsPageState extends ConsumerState<VideoDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Nhập Chi Tiết Video"),),
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: SafeArea(

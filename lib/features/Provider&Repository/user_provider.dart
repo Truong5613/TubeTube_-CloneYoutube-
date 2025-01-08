@@ -13,3 +13,10 @@ final anyUserDataProvider = FutureProvider.family((ref, userId) async {
       await ref.watch(userDataServiceProvider).fetchAnyUserData(userId);
   return user;
 });
+final allUsersProvider = FutureProvider<List<UserModel>>((ref) async {
+  final List<UserModel> allUsers =
+  await ref.watch(userDataServiceProvider).fetchAllUsers();
+  final currentUser = await ref.watch(currentUserProvider.future);
+  return allUsers.where((user) => user.userId != currentUser.userId).toList();
+});
+

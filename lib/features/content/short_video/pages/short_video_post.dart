@@ -8,6 +8,7 @@ import 'package:tubetube/features/Provider&Repository/short_video_repository.dar
 import 'package:tubetube/features/Provider&Repository/user_provider.dart';
 import 'package:tubetube/features/content/short_video/pages/Short_video_tile.dart';
 import 'package:tubetube/features/content/short_video/pages/short_video_page.dart';
+import 'package:tubetube/features/upload/short_video/short_video_edit.dart';
 import 'package:tubetube/home_page.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:tubetube/cores/widgets/flat_button.dart';
@@ -223,7 +224,14 @@ class _ShortPostState extends ConsumerState<ShortPost> {
                           switch (value) {
                             case 0:
                             // Edit Video
-                              print("Edit Video");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ShortVideoEdit( // Assuming VideoDetailsPage is your edit screen
+                                   shortVideoId: widget.video.shortvideoId, Oldcaption: widget.video.caption,
+                                  ),
+                                ),
+                              );
                               break;
                             case 1:
                             // Delete Video

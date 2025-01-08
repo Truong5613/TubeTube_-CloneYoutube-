@@ -51,7 +51,7 @@ class _UserChannelPageState extends State<UserChannelPage> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Image.asset(
-                                  "assets/images/flutter background.png"),
+                                  "assets/images/background.png"),
                               Padding(
                                 padding: const EdgeInsets.all(12.0),
                                 child: Row(
@@ -131,7 +131,7 @@ class _UserChannelPageState extends State<UserChannelPage> {
                                 tabs: [
                                   Tab(text: 'Home'),
                                   Tab(text: 'Videos'),
-                                  Tab(text: 'Short Video'),
+                                  Tab(text: 'Shorts'),
                                   Tab(text: 'About'),
                                 ],
                               ),

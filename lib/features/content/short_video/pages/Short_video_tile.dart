@@ -85,11 +85,6 @@ class _ShortVideoTileState extends ConsumerState<ShortVideoTile> {
   @override
   Widget build(BuildContext context) {
     final AsyncValue<UserModel> user = ref.watch(anyUserDataProvider(widget.shortVideo.userId));
-    if(widget.shortVideo.isHidden || widget.shortVideo.isBanned){
-      return const SizedBox();
-    }
-
-
     return Stack(
       children: [
         // Video player

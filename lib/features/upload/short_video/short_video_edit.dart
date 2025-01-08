@@ -1,28 +1,36 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tubetube/cores/method.dart';
 import 'package:tubetube/cores/widgets/flat_button.dart';
 import 'package:tubetube/features/Provider&Repository/short_video_repository.dart';
 import 'package:tubetube/home_page.dart';
 import 'package:uuid/uuid.dart';
 
-class ShortVideoDetails extends ConsumerStatefulWidget {
-  final File video;
-
-  const ShortVideoDetails({Key? key, required this.video}) : super(key: key);
+class ShortVideoEdit extends ConsumerStatefulWidget {
+  final String shortVideoId;
+  final String Oldcaption;
+  const ShortVideoEdit(  {Key? key, required this.shortVideoId,required this.Oldcaption,})
+      : super(key: key);
 
   @override
-  ConsumerState<ShortVideoDetails> createState() => _ShortVideoDetailsState();
+  ConsumerState<ShortVideoEdit> createState() => _ShortVideoEditState();
 }
 
-class _ShortVideoDetailsState extends ConsumerState<ShortVideoDetails> {
+class _ShortVideoEditState extends ConsumerState<ShortVideoEdit> {
   final captionController = TextEditingController();
-  final DateTime date = DateTime.now();
-  String randomNumber = const Uuid().v4();
-  String shortvideoId = const Uuid().v4();
+  late String userId;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the controller with the old caption
+    captionController.text = widget.Oldcaption;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +39,7 @@ class _ShortVideoDetailsState extends ConsumerState<ShortVideoDetails> {
         centerTitle: true,
         backgroundColor: Colors.red,
         title: const Text(
-          "Chi tiết Video Shorts",
+          "Chỉnh sửa Video Shorts",
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -65,23 +73,18 @@ class _ShortVideoDetailsState extends ConsumerState<ShortVideoDetails> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 30),
                 child: FlatButton(
-                    text: "ĐĂNG VIDEO",
+                    text: "CẬP NHẬT VIDEO",
                     onPressed: () async {
                       try {
-                        String videoUrl = await putFileInStorage(
-                            widget.video, randomNumber, "short_video");
-                        // Upload video
+                        // Cập nhật video
                         await ref
                             .watch(shortVideoProvider)
-                            .addShortVideoTofirestore(
+                            .updateShortVideoInFirestore(
                               caption: captionController.text,
-                              Video: videoUrl,
-                              datePublished: date,
-                              userId: FirebaseAuth.instance.currentUser!.uid,
-                              shortvideoId: shortvideoId,
+                              shortvideoId: widget.shortVideoId,
                             );
 
-                        // Navigate to Homepage
+                        // Quay lại trang chủ sau khi cập nhật thành công
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => HomePage()),
@@ -90,8 +93,7 @@ class _ShortVideoDetailsState extends ConsumerState<ShortVideoDetails> {
                       } catch (error) {
                         // Hiển thị thông báo lỗi nếu có
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('Đăng video thất bại: $error')),
+                          SnackBar(content: Text('Cập nhật thất bại: $error')),
                         );
                       }
                     },

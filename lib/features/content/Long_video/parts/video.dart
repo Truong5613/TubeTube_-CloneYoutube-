@@ -297,7 +297,11 @@ class _VideoState extends ConsumerState<Video> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Mô Tả Video :",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+                          Text(
+                            "Mô Tả Video :",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
                           Text(
                             _isExpanded
                                 ? widget.video.description
@@ -379,7 +383,10 @@ class _VideoState extends ConsumerState<Video> {
                       right: 5,
                     ),
                     child: Text(
-                      user.value!.displayName,
+                      (user.value?.displayName ?? 'Không Rõ').length > 10
+                          ? '${(user.value?.displayName ?? 'Không Rõ').substring(0, 10)}...' // Cắt tối đa 6 ký tự
+                          : user.value?.displayName ?? 'Không Rõ',
+                      // Hiển thị đầy đủ nếu <= 6 ký tự
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                       ),

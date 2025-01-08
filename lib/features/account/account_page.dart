@@ -66,7 +66,7 @@ class AccountPage extends StatelessWidget {
                               ),
                             ),
                             const Text(
-                              "Manage Your Google Account",
+                              "Quản Lý Kênh",
                               style: TextStyle(
                                 color: Colors.blue,
                               ),
@@ -85,7 +85,7 @@ class AccountPage extends StatelessWidget {
                 const Padding(
                   padding: EdgeInsets.only(bottom: 12),
                   child: Text(
-                    "Privacy Policy . Terms of Services",
+                    "Chính Sách Cộng Đồng . Quyền Sử Dụng Dịch Vụ",
                     style: TextStyle(
                       color: Colors.blueGrey,
                       fontSize: 13.5,

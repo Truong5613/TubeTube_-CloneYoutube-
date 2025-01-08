@@ -46,7 +46,7 @@ class UserDataService {
         .set(user.toMap());
   }
   Future<UserModel> fetchCurrentUserData()async{
-    final currentUserMap = await firestore.collection("users").doc(auth.currentUser!.uid).get();
+    final currentUserMap = await firestore.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).get();
     UserModel user = UserModel.fromMap(currentUserMap.data()!);
     return user;
   }
@@ -54,5 +54,13 @@ class UserDataService {
     final currentUserMap = await firestore.collection("users").doc(userId).get();
     UserModel user = UserModel.fromMap(currentUserMap.data()!);
     return user;
+  }
+  Future<List<UserModel>> fetchAllUsers() async {
+    final allUsersSnapshot = await firestore.collection("users").get();
+    final List<UserModel> allUsers = allUsersSnapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data()))
+        .toList();
+    allUsers.removeWhere((user) => user.userId == FirebaseAuth.instance.currentUser!.uid);
+    return allUsers;
   }
 }

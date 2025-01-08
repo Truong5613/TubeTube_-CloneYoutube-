@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubetube/features/auth/pages/logout_page.dart';
+import 'package:tubetube/main.dart';
 
 class BottomNavigation extends StatefulWidget {
   final Function(int index) onPressed;
@@ -10,6 +14,11 @@ class BottomNavigation extends StatefulWidget {
     Key? key,
     required this.onPressed,
   }) : super(key: key);
+
+  Future<void> clearLocalData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 
   @override
   State<BottomNavigation> createState() => _BottomNavigationState();
@@ -40,6 +49,14 @@ class _BottomNavigationState extends State<BottomNavigation> {
     if (result == true) {
       await GoogleSignIn().signOut(); // Đăng xuất Google
       await FirebaseAuth.instance.signOut(); // Đăng xuất Firebase
+      await FirebaseAuth.instance.currentUser?.reload();
+      await FirebaseFirestore.instance.clearPersistence(); // Xóa cache cục bộ
+      await clearLocalData();
+      Phoenix.rebirth(context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const MyApp()),
+            (route) => false, // Xóa tất cả các route trước đó
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đăng xuất thành công!')),
       );

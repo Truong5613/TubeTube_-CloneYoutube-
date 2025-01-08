@@ -55,6 +55,7 @@ class _EditVideoScreenState extends ConsumerState<EditVideoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Chỉnh Sửa Chi Tiết Video"),),
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: SafeArea(

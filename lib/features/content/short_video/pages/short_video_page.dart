@@ -23,12 +23,15 @@ class ShortVideoPage extends StatelessWidget {
               return const Loader();
             }
 
-            final shortVideoMaps = snapshot.data!.docs;
+            var shortVideoMaps = snapshot.data!.docs;
+
+            // Tạo một danh sách mới để chứa video hợp lệ
+            List<dynamic> validShortVideos = [];
 
             // If a shortVideoId is provided, find that video in the collection
             if (shortVideoId != null) {
               final shortVideoIndex = shortVideoMaps.indexWhere(
-                      (doc) => doc['shortvideoId'] == shortVideoId); // Use the correct field name
+                      (doc) => doc['shortvideoId'] == shortVideoId);
 
               if (shortVideoIndex != -1) {
                 // Move the found video to the top of the list
@@ -37,18 +40,28 @@ class ShortVideoPage extends StatelessWidget {
               }
             }
 
+            // Duyệt qua danh sách và chỉ thêm các video hợp lệ vào danh sách mới
+            for (var doc in shortVideoMaps) {
+              ShortVideoModel shortVideo = ShortVideoModel.fromMap(doc.data());
+
+              if (!(shortVideo.isHidden || shortVideo.isBanned)) {
+                validShortVideos.add(doc); // Thêm video hợp lệ vào danh sách mới
+              }
+            }
+
             return PageView.builder(
               scrollDirection: Axis.vertical,
-              itemCount: shortVideoMaps.length,
+              itemCount: validShortVideos.length,
               itemBuilder: (context, index) {
                 ShortVideoModel shortVideo =
-                ShortVideoModel.fromMap(shortVideoMaps[index].data());
+                ShortVideoModel.fromMap(validShortVideos[index].data());
                 return ShortVideoTile(shortVideo: shortVideo);
               },
             );
           },
         ),
       ),
+
     );
   }
 }
